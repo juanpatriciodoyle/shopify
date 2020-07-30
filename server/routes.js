@@ -1,20 +1,16 @@
-// const http = require('http');
-// const hostname = '127.0.0.1';
-// const port = 3000;
-
 //usar libreria got y express
 
-// let connect = require("config/dbConnection");
+let connect = require("./../config/dbConnection");
 
 const express = require('express');
 let app = express();
 
 exports.createServer = () =>{
-    let server = app.listen(3000, function () {
+    let server = app.listen(4200, function () {
         const port = server.address().port;
         console.log("Example app listening at http://localhost:" + port)
 
-        // connect.connect()
+        connect.connect()
     })
 }
 
