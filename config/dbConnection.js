@@ -8,14 +8,6 @@ const connection = mysql.createConnection({
     insecureAuth: true
 });
 
-exports.connect = function () {
-    connection.connect(function(err) {
-        if (err) throw err;
-        console.log("Sql connected!");
-    });
-};
 
-exports.close = function () {
-    connection.end();
-    console.log("Sql disconnected!");
-}
+
+module.exports = connection
