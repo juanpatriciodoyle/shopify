@@ -26,8 +26,8 @@ router.get("/", (req, res) => {
     })
 })
 
-router.get("/id", (req, res) => {
-    connect.query("SELECT * from base where id = "+req.params.id, (err, rows, fiel) => {
+router.get("/:id", (req, res) => {
+    connect.query("SELECT * from base where id = " + req.params.id, (err, rows, fiel) => {
         if (!err) {
             let datas = []
             rows.forEach(x => {
@@ -35,7 +35,7 @@ router.get("/id", (req, res) => {
                 datas.push(data)
             })
             res.send(datas)
-        }
+        } else res.send(err)
     })
 })
 
@@ -92,13 +92,14 @@ router.post("/", (req, res) => {
 
 function save(data) {
     connect.query("INSERT INTO base (data) VALUES ('" + data.data + "')", (err) => {
-        if (err) return err
+        if (err) {
+            return err
+        } else return true;
     })
-    return true;
 }
 
 function update(data) {
-    connect.query("UPDATE base SET data = '"+data.data+"' WHERE id = "+data.id, (err) => {
+    connect.query("UPDATE base SET data = '" + data.data + "' WHERE id = " + data.id, (err) => {
         if (err) return err
     })
     return true;
