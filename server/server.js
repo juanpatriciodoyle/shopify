@@ -1,13 +1,12 @@
-const connect = require("./../config/dbConnection");
 const bodyParser = require("body-parser");
 const express = require('express');
-const data = require("./../model/data")
+const containerRoutes = require("../route/container.route")
 
 
 let app = express()
 
 app.use(bodyParser.json())
-app.use('/data', data)
+app.use('/container', containerRoutes)
 
 exports.createServer = () =>{
     let server = app.listen(4200, function () {

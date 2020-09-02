@@ -8,6 +8,4 @@ const connection = mysql.createConnection({
     insecureAuth: true
 });
 
-
-
 module.exports = connection

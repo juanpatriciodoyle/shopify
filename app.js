@@ -1,3 +1,3 @@
-const server = require('./server/server')
+const firstService = require('./server/server')
 
-server.createServer();
+firstService.createServer();
