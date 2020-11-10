@@ -1,12 +1,12 @@
 const bodyParser = require("body-parser");
 const express = require('express');
-const containerRoutes = require("../route/container.route")
+const productRoutes = require("./route/product.route")
 
 
 let app = express()
 
 app.use(bodyParser.json())
-app.use('/container', containerRoutes)
+app.use('/product', productRoutes)
 
 exports.createServer = () =>{
     let server = app.listen(4200, function () {
@@ -16,6 +16,6 @@ exports.createServer = () =>{
 }
 
 app.get('/', function (req, res) {
-    res.send('server main page');
+    res.send('Product main page');
 })
 

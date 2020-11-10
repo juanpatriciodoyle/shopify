@@ -1,13 +1,13 @@
 
 const express = require("express")
-const connect = require("../config/dbConnection");
+const connect = require("../../config/dbConnection");
 const Container = require("../model/container");
+const {toNewRawContainer} = require("../mapper/mapper");
 const router = express.Router()
 
 
-
 router.get("/", (req, res) => {
-    connect.query("SELECT * from container", (err, rows, fiel) => {
+    connect.query("SELECT * from container", (err, rows) => {
         if (!err) {
             let containerList = []
             rows.forEach(x => {
@@ -22,12 +22,12 @@ router.get("/", (req, res) => {
 router.get("/:id", (req, res) => {
     connect.query("SELECT * from container where id = " + req.params.id, (err, rows, fiel) => {
         if (!err) {
-            let datas = []
+            let containers = []
             rows.forEach(x => {
-                let data = new Data(x.id, x.data)
-                datas.push(data)
+                let container = new Container(x.id, x.data, x.create, x.update, x.category)
+                containers.push(container)
             })
-            res.send(datas)
+            res.send(containers)
         } else res.send(err)
     })
 })
@@ -65,17 +65,16 @@ router.put("/", (req, res) => {
 })
 
 router.post("/", (req, res) => {
-    let data = new Data()
-    data.data = (req.body['data'])
-    if (save(data) === true) {
+    let container = toNewRawContainer(req.body['data'], req.body['category']);
+    if (save(container) === true) {
         connect.query("SELECT * from container", (err, rows, fiel) => {
             if (!err) {
-                let datas = []
+                let containers = []
                 rows.forEach(x => {
-                    let data = new Data(x.id, x.data)
-                    datas.push(data)
+                    let container = new Container(x.id, x.data, x.create, x.update, x.category)
+                    containers.push(container)
                 })
-                res.send(datas)
+                res.send(containers)
             }
         })
     } else {
@@ -83,8 +82,11 @@ router.post("/", (req, res) => {
     }
 })
 
-function save(data) {
-    connect.query("INSERT INTO container (data) VALUES ('" + data.data + "')", (err) => {
+function save(container) {
+    connect.query("INSERT INTO container (data,category) VALUES ("
+        + "'" + container.data + "',"
+        + "'" + container.category + "'" +
+        ")", (err) => {
         if (err) {
             return err
         } else return true;

@@ -1,3 +1,5 @@
-const firstService = require('./server/server')
+const containerService = require('./containerService/server')
+const productService = require('./productService/server')
 
-firstService.createServer();
+containerService.createServer();
+productService.createServer();

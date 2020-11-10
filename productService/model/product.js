@@ -1,15 +1,15 @@
 
-export class Product {
+class Product {
     cod
     name
     stock
     price
 
     constructor(cod, name, stock, price) {
-        this._cod = cod;
-        this._name = name;
-        this._stock = stock;
-        this._price = price;
+        this.cod = cod;
+        this.name = name;
+        this.stock = stock;
+        this.price = price;
     }
 
     get cod() {
@@ -44,3 +44,5 @@ export class Product {
         this._price = value;
     }
 }
+
+module.exports = Product
