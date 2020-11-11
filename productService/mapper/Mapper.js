@@ -1,10 +1,10 @@
-const Container = require("../../containerService/model/container");
-const Product = require("../model/product");
+const Container = require("../../containerService/model/Container");
+const Product = require("../model/Product");
 
-let productToContainer = function (product, category) {
+let productToContainer = function (product) {
     let container = new Container()
     container.data = JSON.stringify(product, null, 1)
-    container.category = category
+    container.category = 'product'
     return container;
 }
 
