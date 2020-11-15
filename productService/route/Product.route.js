@@ -38,12 +38,12 @@ router.delete("/:id", (req, res) => {
         try {
             await got.delete(url+req.params.id).json();
         } catch (error) {
-            res.send(error.body)
+            res.sendStatus(400).send(error.body)
         }
     })();
     (async () => {
         try {
-            const body = await got.get(url).json();
+            const body = await got.get(url+"/product").json();
             res.send(body)
         } catch (error) {
             res.send(error.body)
@@ -67,7 +67,7 @@ router.post("/", (req, res) => {
                 }
             }).json();
         } catch (error) {
-            res.send(error.body)
+            res.send(400).send(error.body)
         }
     })();
 })

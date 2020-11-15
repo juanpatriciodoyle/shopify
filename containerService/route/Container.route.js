@@ -1,8 +1,8 @@
 const express = require("express")
 const connect = require("../../config/dbConnection");
 const Container = require("../model/Container");
-const {containerToProduct} = require("../../productService/mapper/Mapper");
 const {toContainer} = require("../mapper/Mapper");
+const {cartToContainer} = require("../mapper/Mapper");
 const router = express.Router()
 
 
@@ -49,18 +49,57 @@ router.delete("/:id", (req, res) => {
 })
 
 router.put("/:id", (req, res) => {
-    let data = toContainer(req.body['data'], req.body['category'])
-    data.id = req.params.id
-    if (update(data) === true) {
-        res.sendStatus(200)
-    } else {
-        res.sendStatus(404)
+    if (req.body['category'] === "product") {
+        let data = toContainer(req.body['data'], req.body['category'])
+        data.id = req.params.id
+        if (update(data) === true) {
+            res.sendStatus(200)
+        } else {
+            res.sendStatus(404)
+        }
     }
+    if (req.body['category'] === "cart") {
+        let data = toContainer(req.body['data'], req.body['category'])
+        data.id = req.params.id
+        if (update(data) === true) {
+            res.sendStatus(200)
+        } else {
+            res.sendStatus(404)
+        }
+    }
+    if (req.body['category'] === "paid cart") {
+        let data = toContainer(req.body['data'], req.body['category'])
+        data.id = req.params.id
+        if (update(data) === true) {
+            res.sendStatus(200)
+        } else {
+            res.sendStatus(404)
+        }
+    }
+
 })
 
 router.post("/", (req, res) => {
-    let container = toContainer(req.body['data'], req.body['category']);
-    if (save(container) === true) {
+    if (req.body['category'] === "product") {
+        let container = toContainer(req.body['data'], req.body['category']);
+        if (save(container) === true) {
+            connect.query("SELECT * from container", (err, rows) => {
+                if (!err) {
+                    let containers = []
+                    rows.forEach(x => {
+                        let container = new Container(x.id, x.data, x.create, x.update, x.category)
+                        containers.push(container)
+                    })
+                    res.send(containers)
+                }
+            })
+        } else {
+            res.sendStatus(404)
+        }
+    }
+    if (req.body['category'] === "cart") {
+        let container = cartToContainer(req.body['data'], req.body['category']);
+        save(container)
         connect.query("SELECT * from container", (err, rows) => {
             if (!err) {
                 let containers = []
@@ -71,9 +110,8 @@ router.post("/", (req, res) => {
                 res.send(containers)
             }
         })
-    } else {
-        res.sendStatus(404)
     }
+
 })
 
 function isNumeric(str) {

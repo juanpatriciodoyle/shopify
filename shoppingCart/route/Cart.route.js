@@ -1,49 +1,72 @@
-
 const express = require("express")
 const got = require("got")
-const {containerToProduct} = require("../Actions");
+const {containerToCart} = require("../mapper/Mapper");
 const router = express.Router()
 const url = 'http://localhost:4100/container/'
-
+const urlProduct = 'http://localhost:4200/product/'
 
 
 router.get("/", (req, res) => {
     (async () => {
         try {
-            const body = await got.get(url+"/product").json();
+            const body = await got.get(url + "/cart").json();
             let products = []
             body.forEach(b => {
-                products.push(containerToProduct(b))
+                products.push(containerToCart(b))
             })
             res.send(products)
         } catch (error) {
-            res.send(error.body)
+            res.send(error.body).sendStatus(400)
         }
     })();
 })
 
 router.get("/:id", (req, res) => {
-        (async () => {
-            try {
-                const body = await got.get(url+req.params.id).json();
-                res.send(containerToProduct(body))
-            } catch (error) {
-                res.send(error.body)
-            }
+    (async () => {
+        try {
+            const body = await got.get(url + req.params.id).json();
+            res.send(containerToCart(body))
+        } catch (error) {
+            res.send(error.body)
+        }
+    })();
+})
+
+router.get("/total/:id", async (req, res) => {
+    let body;
+    await (async () => {
+        body = await got.get(url + req.params.id).json();
+        body = containerToCart(body)
+    })();
+
+    let products = body.product
+    let quantities = body.quantity
+    let price = 0
+
+    let productsNumbers = products.split`,`.map(x => +x)
+    let quantitiesNumbers = quantities.split`,`.map(x => +x)
+    for (let i = 0; i < productsNumbers.length; i++) {
+        await (async () => {
+            body = await got.get(urlProduct + productsNumbers[i].toString()).json();
+            price += body.price * quantitiesNumbers[i];
         })();
+    }
+
+    res.send(price.toString())
+
 })
 
 router.delete("/:id", (req, res) => {
     (async () => {
         try {
-            await got.delete(url+req.params.id).json();
+            await got.delete(url + req.params.id).json();
         } catch (error) {
-            res.send(error.body)
+            res.sendStatus(400).send(error.body)
         }
     })();
     (async () => {
         try {
-            const body = await got.get(url).json();
+            const body = await got.get(url + "/cart").json();
             res.send(body)
         } catch (error) {
             res.send(error.body)
@@ -53,38 +76,69 @@ router.delete("/:id", (req, res) => {
 
 router.post("/", (req, res) => {
 
+    if (req.body.data.id === undefined) {
+        (async () => {
+            try {
+                await got.post(url, {
+                    json: {
+                        "data": "new",
+                        "category": "cart"
+                    }
+                }).json();
+                res.sendStatus(200)
+            } catch (error) {
+                res.sendStatus(400).send(error.body)
+            }
+        })();
+    }
+
+})
+
+router.put("/:id", (req, res) => {
+    let products = req.body.data.product
+    let quantities = req.body.data.quantity;
+
     (async () => {
         try {
-            await got.post(url, {
+            await got.put(url + req.params.id, {
                 json: {
                     "data": {
-                        "cod" : req.body.data.cod,
-                        "name" : req.body.data.name,
-                        "stock" : req.body.data.stock,
-                        "price" : req.body.data.price
+                        "product": products,
+                        "quantity": quantities
                     },
-                    "category": "product"
+                    "category": "cart"
                 }
-            }).json();
+            });
+            res.sendStatus(202)
         } catch (error) {
-            res.send(error.body)
+            res.sendStatus(400)
         }
     })();
 })
 
-router.put("/:id", (req, res) => {
+router.put("pay/:id", (req, res) => {
+
+    let body;
+
+    (async () => {
+        try {
+            body = await got.get(url + req.params.id).json();
+            body = containerToCart(body)
+        } catch (error) {
+            res.send(error.body)
+        }
+    })();
+
 
     (async () => {
         try {
             await got.put(url+req.params.id, {
                 json: {
                     "data": {
-                        "cod" : req.body.data.cod,
-                        "name" : req.body.data.name,
-                        "stock" : req.body.data.stock,
-                        "price" : req.body.data.price
+                        "product": body.data.products,
+                        "quantity": body.data.quantities
                     },
-                    "category": "product"
+                    "category": "paid cart"
                 }
             }).then();
             res.sendStatus(202)
@@ -93,6 +147,5 @@ router.put("/:id", (req, res) => {
         }
     })();
 })
-
 
 module.exports = router
