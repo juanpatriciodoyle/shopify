@@ -52,6 +52,7 @@ router.put("/:id", (req, res) => {
     if (req.body['category'] === "product") {
         let data = toContainer(req.body['data'], req.body['category'])
         data.id = req.params.id
+        data.update = Math.floor(new Date() / 1000)
         if (update(data) === true) {
             res.sendStatus(200)
         } else {
@@ -61,6 +62,7 @@ router.put("/:id", (req, res) => {
     if (req.body['category'] === "cart") {
         let data = toContainer(req.body['data'], req.body['category'])
         data.id = req.params.id
+        data.update = Math.floor(new Date() / 1000)
         if (update(data) === true) {
             res.sendStatus(200)
         } else {
@@ -69,7 +71,8 @@ router.put("/:id", (req, res) => {
     }
     if (req.body['category'] === "paid cart") {
         let data = toContainer(req.body['data'], req.body['category'])
-        data.id = req.params.id
+        data.id = parseInt(req.params.id)
+        data.update = Math.floor(new Date() / 1000)
         if (update(data) === true) {
             res.sendStatus(200)
         } else {
@@ -132,7 +135,7 @@ function save(container) {
 }
 
 function update(data) {
-    connect.query("UPDATE container SET data = '" + data.data + "' WHERE id = " + data.id, (err) => {
+    connect.query("UPDATE container SET data = '" + data.data + "', category= '"+data.category+"'  WHERE id = " + data.id, (err) => {
         if (err) return false
     })
     return true;

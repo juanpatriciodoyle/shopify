@@ -11,7 +11,7 @@ app.use('/cart', cartRoutes)
 exports.createServer = () =>{
     let server = app.listen(4300, function () {
         const port = server.address().port;
-        console.log("Example app listening at http://localhost:" + port)
+        console.log("Shopping Cart app listening at http://localhost:" + port)
     })
 }
 

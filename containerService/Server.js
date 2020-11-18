@@ -11,7 +11,7 @@ app.use('/container', containerRoutes)
 exports.createServer = () =>{
     let server = app.listen(4100, function () {
         const port = server.address().port;
-        console.log("Example app listening at http://localhost:" + port)
+        console.log("Container app listening at http://localhost:" + port)
     })
 }
 

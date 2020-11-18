@@ -11,7 +11,7 @@ app.use('/product', productRoutes)
 exports.createServer = () =>{
     let server = app.listen(4200, function () {
         const port = server.address().port;
-        console.log("Example app listening at http://localhost:" + port)
+        console.log("Product app listening at http://localhost:" + port)
     })
 }
 
